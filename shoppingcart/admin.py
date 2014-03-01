@@ -1,3 +1,5 @@
 from django.contrib import admin
+from shoppingcart.models import Store, UserProfile
 
-# Register your models here.
+admin.site.register(Store)
+admin.site.register(UserProfile)
