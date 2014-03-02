@@ -1,2 +1,27 @@
 {% extends "shoppingcart/layout.html" %}
-checkout
+{% load custom_filters %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-8 col-md-8">
+            <ul>
+            {% for product in products %}
+                <li><p>{{product.name}} {{cart| get_item:product.id }} x {{product.price}} = {% multiply cart|get_item:product.id  product.price%} </p>
+                </li>
+            {% endfor %}
+            </ul>
+            <p><strong>Total:</strong> {{sum}}</p>
+       </div>
+    </div>
+    <form class="form-inline" role="form" method="post" action="/checkout">
+         {% csrf_token %}
+         <div class="form-group">
+            <label for="address" class="col-md-3 control-label">Shipping Address</label>
+            <div class="col-md-7">
+              <textarea class="form-control" name="address" id="address" rows="3"></textarea>
+            </div>
+          </div>
+         <button type="submit" class="btn btn-default">Make Payment</button>
+    </form>
+</div>
+{% endblock %}

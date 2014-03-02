@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.template import RequestContext
@@ -61,7 +60,6 @@ def register(request):
         else:
             userprofile = UserProfile(user=user, store = request.store)
             userprofile.save()
-            print "%s?next=%s" % (reverse('login'), next)
             return HttpResponseRedirect("%s?next=%s" % (reverse('login'), next))
 
     t = select_template(['shoppingcart/' + request.store.sub_domain + \
@@ -98,18 +96,30 @@ def cart(request, pk = None, quantity = None):
             return HttpResponseRedirect(reverse('index'))
 
 
-# order
+# checkout process
 
 @login_required(login_url='/login')
+@require_http_methods(["GET", "POST"])
 def checkout(request):
+    cart = Cart(request)
     if request.method == 'POST':
-        cart = Cart(request)
-        order = Order.objects.create(user=request.user, total=cart.total())
+        address = request.POST.get('address')
+        order = Order.objects.create(user=request.user, total=cart.total(), address=address)
         for key in cart.cart:
             od = OrderDetail.objects.create(order=order, \
                 product=Product.objects.get(id=key), quantity=cart.cart[key])
             od.save()
-    context = {}
-    t = select_template(['shoppingcart/' + request.store.sub_domain + \
-            '/checkout.html', 'shoppingcart/checkout.html'])
-    return HttpResponse(t.render(RequestContext(request, context)))
+        t = select_template(['shoppingcart/' + request.store.sub_domain + \
+            '/order_complete.html', 'shoppingcart/order_complete.html'])
+        context = {}
+        cart.clear()
+        return HttpResponse(t.render(RequestContext(request, context)))
+    elif request.method == 'GET':
+        context =  {
+                'cart': cart.cart,
+                'products': Product.objects.filter(pk__in=cart.cart.keys()),
+                'sum': cart.total()
+            }
+        t = select_template(['shoppingcart/' + request.store.sub_domain + \
+                '/checkout.html', 'shoppingcart/checkout.html'])
+        return HttpResponse(t.render(RequestContext(request, context)))

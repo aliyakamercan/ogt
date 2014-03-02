@@ -21,7 +21,7 @@ class Cart:
             if int(quantity) == 0:
                 self.cart.pop(product_id)
             else:
-                self.cart[product_id] = quantity
+                self.cart[product_id] = int(quantity)
         self._update_session()
 
     def clear(self):
@@ -30,7 +30,6 @@ class Cart:
 
     def total(self):
         total = Decimal(0)
-        print self.cart
         for product_id in self.cart:
             price = Product.objects.get(id=product_id).price
             total += price * Decimal(self.cart[product_id])

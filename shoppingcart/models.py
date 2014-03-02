@@ -36,6 +36,7 @@ class Product(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(User)
     products = models.ManyToManyField(Product, through='OrderDetail')
+    address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     total = CurrencyField(default=0, decimal_places=2, max_digits=10)
