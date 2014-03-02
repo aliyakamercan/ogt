@@ -123,3 +123,16 @@ def checkout(request):
         t = select_template(['shoppingcart/' + request.store.sub_domain + \
                 '/checkout.html', 'shoppingcart/checkout.html'])
         return HttpResponse(t.render(RequestContext(request, context)))
+
+# user orders
+
+@login_required(login_url='/login')
+@require_http_methods(["GET"])
+def orders(request):
+    orders = request.user.order_set.all()
+    context =  {
+            'orders': orders
+        }
+    t = select_template(['shoppingcart/' + request.store.sub_domain + \
+            '/orders.html', 'shoppingcart/orders.html'])
+    return HttpResponse(t.render(RequestContext(request, context)))

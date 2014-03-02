@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     # order
     url(r'^checkout$', views.checkout, name='checkout'),
     #profile
+    url(r'^orders$', views.orders, name='orders'),
 )
