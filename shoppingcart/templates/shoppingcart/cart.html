@@ -1,0 +1,31 @@
+{% extends "shoppingcart/layout.html" %}
+{% load custom_filters %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        {% for product in products %}
+        <div class="col-sm-6 col-md-4">
+            <div class="thumbnail">
+                <img src="{{product.img_url}}">
+                <div class="caption">
+                    <h3>{{product.name}}</h3>
+                    <p>{{product.description}}</p>
+
+                    <form class="form-inline" role="form" method="post" action="/update">
+                      <div class="form-group">
+                        {% csrf_token %}
+                        <label class="sr-only" for="quantity">Quantity</label>
+                        <input type="hidden" id="pk" name="pk" value="{{product.id}}">
+                        <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity" value="{{cart| get_item:product.id }}">
+                      </div>
+                      <button type="submit" class="btn btn-default">Update</button>
+                    </form>
+                    <a href="/remove?pk={{product.id}}">Remove</a>
+                </div>
+            </div>
+        </div>
+       {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-default">Checkout</button>
+</div>
+{% endblock %}
