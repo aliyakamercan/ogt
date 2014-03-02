@@ -6,6 +6,7 @@ from django.contrib import auth
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 
 from shoppingcart.models import UserProfile, Product, Order, OrderDetail
 from shoppingcart.cart import Cart
@@ -57,43 +58,31 @@ def register(request):
 
 # cart functionality
 
-def add_to_cart(request):
+@require_http_methods(["GET", "POST"])
+def cart(request, pk = None, quantity = None):
     cart = Cart(request)
-    try:
-        pk = request.GET.get('product_id')
-        print pk
-        product = Product.objects.get(id=pk)
-        print product
-        cart.add(pk)
-        messages.add_message(request, messages.INFO, '%s added to cart. Continue shopping or visit your cart to checkut' \
+    if request.method == "GET":
+        context =  {
+            'cart': cart.cart,
+            'products': Product.objects.filter(pk__in=cart.cart.keys()),
+            'sum': cart.total()
+        }
+        return render(request, 'shoppingcart/cart.html', \
+            RequestContext(request, context))
+    elif request.method == "POST" and pk:
+        quantity = request.POST.get('quantity')
+        if quantity:
+            cart.update(pk, quantity)
+            return HttpResponseRedirect(reverse('cart'))
+        else:
+            product = Product.objects.get(id=pk)
+            cart.add(pk)
+            messages.add_message(request, messages.INFO, '%s added to cart. Continue shopping or visit your cart to checkut' \
         % product.name)
-    except:
-        messages.add_message(request, messages.INFO, 'Ops something went wrong. Try again later pls')
-    return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse('index'))
 
-def cart(request):
-    cart = Cart(request)
-    context =  {
-        'cart': cart.cart,
-        'products': Product.objects.filter(pk__in=cart.cart.keys()),
-        'sum': cart.total()
-    }
-    return render(request, 'shoppingcart/cart.html', \
-        RequestContext(request, context))
 
-def remove(request):
-    pk = request.GET.get('pk')
-    cart = Cart(request)
-    cart.remove(pk)
-    return HttpResponseRedirect(reverse('cart'))
-
-def update(request):
-    if request.method == 'POST':
-        pk = request.POST.get('pk', '')
-        quantity = request.POST.get('quantity', '')
-        cart = Cart(request)
-        cart.update(pk, quantity)
-        return HttpResponseRedirect(reverse('cart'))
+# order
 
 @login_required(login_url='/login')
 def checkout(request):

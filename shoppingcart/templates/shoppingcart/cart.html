@@ -11,16 +11,19 @@
                     <h3>{{product.name}}</h3>
                     <p>{{product.description}}</p>
 
-                    <form class="form-inline" role="form" method="post" action="/update">
+                    <form class="form-inline" role="form" method="post" action="/cart/{{product.id}}/">
                       <div class="form-group">
                         {% csrf_token %}
                         <label class="sr-only" for="quantity">Quantity</label>
-                        <input type="hidden" id="pk" name="pk" value="{{product.id}}">
                         <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Quantity" value="{{cart| get_item:product.id }}">
                       </div>
                       <button type="submit" class="btn btn-default">Update</button>
                     </form>
-                    <a href="/remove?pk={{product.id}}">Remove</a>
+                    <form class="form-inline" role="form" method="post" action="/cart/{{product.id}}/">
+                         {% csrf_token %}
+                         <input type="hidden" class="form-control" id="quantity" name="quantity" placeholder="Quantity" value="0">
+                        <button type="submit" class="btn btn-default">Remove</button>
+                    </form>
                 </div>
             </div>
         </div>

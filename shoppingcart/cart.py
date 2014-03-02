@@ -16,14 +16,12 @@ class Cart:
             self.cart[product_id] = quantity
         self._update_session()
 
-    def remove(self, product_id):
-        if product_id in self.cart:
-            self.cart.pop(product_id)
-        self._update_session()
-
     def update(self, product_id, quantity):
         if product_id in self.cart:
-            self.cart[product_id] = quantity
+            if int(quantity) == 0:
+                self.cart.pop(product_id)
+            else:
+                self.cart[product_id] = quantity
         self._update_session()
 
     def clear(self):
