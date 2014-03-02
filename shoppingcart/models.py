@@ -7,7 +7,7 @@ class Store(models.Model):
     name = models.CharField(max_length=200, unique=True)
     sub_domain = models.CharField(max_length=200, unique=True)
     custom_css = models.URLField(blank=True)
-    custom_body = models.URLField(blank=True)
+    description = models.TextField(blank=True)
 
     def __unicode__(self):
         return u'%s' % (self.name)
