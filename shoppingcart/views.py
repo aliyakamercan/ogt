@@ -5,8 +5,9 @@ from django.template import RequestContext
 from django.contrib import auth
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 
-from shoppingcart.models import UserProfile, Product
+from shoppingcart.models import UserProfile, Product, Order, OrderDetail
 from shoppingcart.cart import Cart
 
 
@@ -22,13 +23,12 @@ def login(request):
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
         user = auth.authenticate(username=username, password=password)
-        print user
-        print user.userprofile.store
         if user is not None and user.is_active and user.userprofile.store == request.store:
             # Correct password, and the user is marked "active"
             auth.login(request, user)
             # Redirect to a success page.
-            return HttpResponseRedirect("/")
+            next = request.GET.get('next', reverse('index'))
+            return HttpResponseRedirect(next)
         else:
             # Show an error page
             messages.add_message(request, messages.INFO, 'Login Failed!')
@@ -94,3 +94,16 @@ def update(request):
         cart = Cart(request)
         cart.update(pk, quantity)
         return HttpResponseRedirect(reverse('cart'))
+
+@login_required(login_url='/login')
+def checkout(request):
+    if request.method == 'POST':
+        cart = Cart(request)
+        order = Order.objects.create(user=request.user, total=cart.total())
+        for key in cart.cart:
+            od = OrderDetail.objects.create(order=order, \
+                product=Product.objects.get(id=key), quantity=cart.cart[key])
+            od.save()
+        context = {}
+        return render(request, 'shoppingcart/checkout.html', \
+            RequestContext(request, context))

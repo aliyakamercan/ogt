@@ -31,3 +31,23 @@ class Product(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.name)
+
+
+class Order(models.Model):
+    user = models.ForeignKey(User)
+    products = models.ManyToManyField(Product, through='OrderDetail')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    total = CurrencyField(default=0, decimal_places=2, max_digits=10)
+
+    def __unicode__(self):
+        return u'%s: %s - %s' %(self.id, self.user.username, self.total)
+
+class OrderDetail(models.Model):
+    product = models.ForeignKey(Product)
+    order = models.ForeignKey(Order)
+    quantity = models.IntegerField(default=1)
+
+    def __unicode__(self):
+        return u'<Order: %s, Product: %s, Quantity: %s>' % \
+            (self.order, self.product, self.quantity)
