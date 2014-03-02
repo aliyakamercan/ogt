@@ -27,10 +27,10 @@ def login(request):
     if request.method == 'POST':
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
+        next = request.POST.get('next', '')
         user = auth.authenticate(username=username, password=password)
         if user is not None and user.is_active and user.userprofile.store == request.store:
             auth.login(request, user)
-            next = request.GET.get('next', reverse('index'))
             return HttpResponseRedirect(next)
         else:
             # Show an error page
@@ -38,28 +38,38 @@ def login(request):
             return HttpResponseRedirect(reverse('login'))
     t = select_template(['shoppingcart/' + request.store.sub_domain + \
         '/login.html', 'shoppingcart/login.html'])
-    return HttpResponse(t.render(RequestContext(request)))
+    context = {
+        'next' : request.GET.get('next', reverse('index'))
+    }
+    return HttpResponse(t.render(RequestContext(request, context)))
 
+@login_required(login_url='/login')
 def logout(request):
     auth.logout(request)
     messages.add_message(request, messages.INFO, 'Logged out. Please Visit again!')
     return HttpResponseRedirect(reverse('index'))
 
 def register(request):
-    print "asdasd"
-    print request.POST
     if request.method == 'POST':
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
-        print username
-        print password
-        user = User.objects.create_user(username, None, password)
-        userprofile = UserProfile(user=user, store = request.store)
-        userprofile.save()
-        return HttpResponseRedirect(reverse('index'))
+        next = request.POST.get('next', '/')
+        try:
+            user = User.objects.create_user(username, None, password)
+        except:
+            messages.add_message(request, messages.INFO, 'Username taken')
+        else:
+            userprofile = UserProfile(user=user, store = request.store)
+            userprofile.save()
+            print "%s?next=%s" % (reverse('login'), next)
+            return HttpResponseRedirect("%s?next=%s" % (reverse('login'), next))
+
     t = select_template(['shoppingcart/' + request.store.sub_domain + \
         '/register.html', 'shoppingcart/register.html'])
-    return HttpResponse(t.render(RequestContext(request)))
+    context = {
+        'next' : request.GET.get('next', request.POST.get('next', reverse('index')))
+    }
+    return HttpResponse(t.render(RequestContext(request, context)))
 
 # cart functionality
 
@@ -99,7 +109,7 @@ def checkout(request):
             od = OrderDetail.objects.create(order=order, \
                 product=Product.objects.get(id=key), quantity=cart.cart[key])
             od.save()
-        context = {}
-        t = select_template(['shoppingcart/' + request.store.sub_domain + \
+    context = {}
+    t = select_template(['shoppingcart/' + request.store.sub_domain + \
             '/checkout.html', 'shoppingcart/checkout.html'])
-        return HttpResponse(t.render(RequestContext(request, context)))
+    return HttpResponse(t.render(RequestContext(request, context)))

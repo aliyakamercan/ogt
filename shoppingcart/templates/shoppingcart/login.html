@@ -5,6 +5,7 @@
         <div class="col-md-6">
             <form role="form" action="/login" method="post">
             {% csrf_token %}
+            <input type="hidden" id="next" name="next" value="{{next}}">
               <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" class="form-control" name="username" id="username" placeholder="Enter username">
@@ -15,6 +16,7 @@
               </div>
               <button type="submit" class="btn btn-default">Login</button>
             </form>
+            <p> Don't have an account ? <a href="/register?next={{next}}">Register Here!</a></p>
         </div>
     </div>
 </div>

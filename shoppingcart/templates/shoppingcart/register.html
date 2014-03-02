@@ -5,6 +5,7 @@
         <div class="col-md-6">
             <form role="form" action="/register" method="post">
             {% csrf_token %}
+            <input type="hidden" id="next" name="next" value="{{next}}">
               <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" class="form-control" name="username" id="username" placeholder="Enter username">
