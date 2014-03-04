@@ -1,1 +1,12 @@
 The store you were looking for was not found. Please make sure you have the correct url.
+If you are trying to visit admin page go to ogt.dev:8000/admin
+
+A list of our stores:
+<ul>
+{% for store in stores %}
+    <li>
+        <p> {{store.name}} </p>
+        <p> {{store.description}} </p>
+    </li>
+{% endfor %}
+</ul>

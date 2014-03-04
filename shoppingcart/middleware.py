@@ -49,4 +49,5 @@ class SubdomainProcessor(object):
             request.store = Store.objects.filter(sub_domain = subdomain).first()
         if not request.store:
             if  "admin" not in request.path: #not admin page req
-                return render(request, "shoppingcart/storenotfound.html")
+                stores = Store.objects.all()
+                return render(request, "shoppingcart/storenotfound.html", dict(stores=stores))
