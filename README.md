@@ -16,6 +16,7 @@ make sure to add
 to your /etc/hosts file
 
 
+superuser is su/su
 
 TODO:
 
