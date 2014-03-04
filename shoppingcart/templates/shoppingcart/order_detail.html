@@ -1,0 +1,14 @@
+{% extends "shoppingcart/layout.html" %}
+{% load custom_filters %}
+{% block content %}
+<ul>
+    {% for detail in order_details %}
+        <li>
+            <p> {{ detail.product.name}} </p>
+            <p> {{ detail.quantity}} </p>
+            <p> {% multiply detail.quantity detail.product.price %} </p>
+
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

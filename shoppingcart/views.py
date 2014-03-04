@@ -136,3 +136,14 @@ def orders(request):
     t = select_template(['shoppingcart/' + request.store.sub_domain + \
             '/orders.html', 'shoppingcart/orders.html'])
     return HttpResponse(t.render(RequestContext(request, context)))
+
+@login_required(login_url='/login')
+@require_http_methods(["GET"])
+def order_detail(request, id):
+    order_details = OrderDetail.objects.filter(order=id)
+    context =  {
+            'order_details': order_details
+        }
+    t = select_template(['shoppingcart/' + request.store.sub_domain + \
+            '/order_detail.html', 'shoppingcart/order_detail.html'])
+    return HttpResponse(t.render(RequestContext(request, context)))

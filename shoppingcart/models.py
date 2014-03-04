@@ -6,7 +6,7 @@ from shoppingcart.fields import CurrencyField
 class Store(models.Model):
     name = models.CharField(max_length=200, unique=True)
     sub_domain = models.CharField(max_length=200, unique=True)
-    custom_css = models.URLField(blank=True)
+    custom_css = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
 
     def __unicode__(self):

@@ -2,10 +2,11 @@
 {% block content %}
 <ul>
     {% for order in orders %}
-        <li>
-            <p> {{ order.created_at}} </p>
-            <p> {{ order.address }} </p>
-            <p> {{ order.total }} </p>
+        <li><a href="/order/{{order.id}}/">
+                <p> {{ order.created_at}} </p>
+                <p> {{ order.address }} </p>
+                <p> {{ order.total }} </p>
+            </a>
         </li>
     {% endfor %}
 </ul>
