@@ -18,7 +18,13 @@ to your /etc/hosts file
 
 superuser is su/su
 
+you can run tests by
+
+```
+python manage.py test
+```
+
 TODO:
 
 remove items from inventory upon orders
-write tests
+
